@@ -3,6 +3,9 @@ import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import useProductDetail from '../composables/useProductDetail';
 import { getStarClass } from '../helpers/stars';
+import { useCartStore } from '../stores/cart';
+
+const cartStore = useCartStore()
 
 const {
     product: detailProduct,
@@ -62,7 +65,7 @@ onMounted(() => getProduct(route.params.id));
                     <span class="price-label">Precio</span>
                     <span class="product-price">{{ detailProduct.price }} €</span>
                 </div>
-                <button class="btn btn--cta purchase-btn" :disabled="detailProduct.stock <= 0">
+                <button @click="cartStore.addProduct(detailProduct)" class="btn btn--cta purchase-btn" :disabled="detailProduct.stock <= 0">
                     <i class="fas fa-shopping-cart"></i> Añadir al carrito
                 </button>
             </div>

@@ -1,16 +1,66 @@
 <script setup>
-import { useCartStore } from "../stores/cart"
-const cartStore = useCartStore()
+import { onMounted, ref } from "vue";
+import { useCartStore } from "../stores/cart";
+import { useAuthStore } from "../stores/auth";
+
+const cartStore = useCartStore();
+const authStore = useAuthStore();
+
+const validationInProcess = ref(true);
+const validationError = ref('');
+
+onMounted(async () => {
+    if (cartStore.items.length === 0) {
+        validationInProcess.value = false;
+        return;
+    }
+    try {
+        //Transformamos los items del carrito en el formato
+        //que necesita la API para validar el carrito
+        const formatCartItems = cartStore.items.map(item => ({
+            productId: item.id || item.productId || item._id,
+            quantity: item.quantity
+        }));
+        const jsonItems = JSON.stringify(formatCartItems);
+        const url = `http://localhost:3000/cart?items=${encodeURIComponent(jsonItems)}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authStore.token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Error del servidor (Status: ${response.status})`);
+        }
+        const serverData = await response.json();
+        console.log('✅ Carrito validado con éxito con el backend:', serverData);
+    } catch(error) {
+        validationError.value = error.message
+    } finally {
+        validationInProcess.value = false;
+    }
+})
 </script>
 
 <template>
     <div class="cart-view">
         <h1 class="title-section">Mi Carrito</h1>
-        <div v-if="cartStore.items.length === 0" class="empty-cart">
+        <div v-if="validationInProcess" class="loading-state">
+            <p>Validando productos con el servidor...</p>
+        </div>
+
+        <div v-else-if="validationError" class="error-state">
+            <p class="error-msg">{{ validationError }}</p>
+        </div>
+
+        <div v-else-if="cartStore.items.length === 0" class="empty-cart">
             <i class="fas fa-shopping-basket empty-icon"></i>
             <p>Tu carrito está vacío</p>
             <router-link to="/" class="btn btn--cta start-shopping">Ir a la tienda</router-link>
         </div>
+
         <div v-else class="cart-content">
             <div class="cart-items-list">
                 <div v-for="item in cartStore.items" :key="item.id" class="cart-item-card">

@@ -2,12 +2,15 @@
 import { onMounted, ref } from "vue";
 import { useCartStore } from "../stores/cart";
 import { useAuthStore } from "../stores/auth";
+import { useRouter } from "vue-router";
 
 const cartStore = useCartStore();
 const authStore = useAuthStore();
+const router = useRouter();
 
 const validationInProcess = ref(true);
 const validationError = ref('');
+const isSubmiting = ref(false);
 
 onMounted(async () => {
     if (cartStore.items.length === 0) {
@@ -30,18 +33,59 @@ onMounted(async () => {
                 'Content-Type': 'application/json'
             }
         });
+        const serverData = await response.json().catch(() => ({}));
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `Error del servidor (Status: ${response.status})`);
         }
-        const serverData = await response.json();
         console.log('✅ Carrito validado con éxito con el backend:', serverData);
-    } catch(error) {
+    } catch (error) {
         validationError.value = error.message
     } finally {
         validationInProcess.value = false;
     }
 })
+
+const handleCheckout = async () => {
+    if (cartStore.items.length === 0) return;
+    isSubmiting.value = true;
+
+    try {
+        const formatCartItems = cartStore.items.map(item => ({
+            productId: item.id || item.productId,
+            quantity: item.quantity
+        }));
+
+        const response = await fetch("http://localhost:3000/cart/purchase", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${authStore.token}` //token del store
+            },
+            body: JSON.stringify({
+                items: formatCartItems
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error("No se pudo completar la compra en el servidor.");
+        }
+
+        const purchaseResult = await response.json();
+        console.log("Compra realizada con éxito:", purchaseResult);
+
+        //Vaciar carrito de Pinia
+        cartStore.clearCart();
+
+        //Recogemos el id de pedido que nos da la API
+        //para ir a la página de pedido
+        const orderId = purchaseResult.id || purchaseResult.purchaseId || purchaseResult.data?.id || "success";
+        router.push(`/purchases/${orderId}`);
+    } catch (error) {
+        alert(error.message)
+    } finally {
+        isSubmiting.value = false;
+    }
+}
 </script>
 
 <template>
@@ -85,8 +129,8 @@ onMounted(async () => {
                     <span>Total a pagar:</span>
                     <span class="total-amount">{{ cartStore.totalPrice.toFixed(2) }} €</span>
                 </div>
-                <button class="btn btn--cta checkout-btn">
-                    Tramitar Pedido
+                <button @click="handleCheckout" :disabled="isSubmiting" class="btn btn--cta checkout-btn">
+                    {{ isSubmiting ? 'Procesando...' : 'Tramitar Pedido' }}
                 </button>
             </div>
         </div>

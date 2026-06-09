@@ -29,11 +29,16 @@ export const useCartStore = defineStore("cart", () => {
     return items.value.reduce((total, item) => total + (item.price * item.quantity), 0)
   })
 
+  const clearCart = () => {
+    items.value = []
+  }
+
   return {
     items,
     addProduct,
     removeProduct,
     totalItems,
-    totalPrice
+    totalPrice,
+    clearCart
   }
 });

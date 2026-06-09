@@ -2,11 +2,24 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 
 export const useAuthStore = defineStore("auth", () => {
-  const isLogged = ref(false);
   const token = ref(localStorage.getItem("token") || "");
-  const user = ref(JSON.parse(localStorage.getItem("user")) || null);
+  const isLogged = ref(false);
+  const user = ref(null);
 
-  if (token.value) isLogged.value = true;
+  // Por si se ha guardado un información anterior no válida
+  try {
+    const savedUser = localStorage.getItem("user");
+    user.value = savedUser && savedUser !== "undefined" ? JSON.parse(savedUser) : null;
+  } catch (e) {
+    user.value = null;
+  }
+
+  if (token.value && token.value !== "undefined" && token.value !== "238") {
+    isLogged.value = true;
+  } else {
+    token.value = "";
+    isLogged.value = false;
+  }
 
   const login = async (username, password) => {
     try {
@@ -19,12 +32,9 @@ export const useAuthStore = defineStore("auth", () => {
         }),
       });
       if (!resp.ok) throw new Error("Credenciales inválidas");
-      token.value = 238; //fake token
-      user.value = {
-        name: "John Doe",
-        avatar:
-          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
-      };
+      const data = await resp.json();
+      token.value = data.token; 
+      user.value = data.user || { name: username };
       isLogged.value = true;
       localStorage.setItem("token", token.value);
       localStorage.setItem("user", JSON.stringify(user.value));

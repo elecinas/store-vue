@@ -1,7 +1,9 @@
 <script setup>
 import { useCartStore } from './stores/cart';
+import { useAuthStore } from './stores/auth';
 
 const cartStore = useCartStore()
+const authStore = useAuthStore()
 </script>
 
 <template>
@@ -15,7 +17,14 @@ const cartStore = useCartStore()
         {{ cartStore.totalItems }}
       </span>
     </router-link>
-    <router-link to="/profile" class="fas fa-user has-color-light"></router-link>
+    <router-link to="/profile" class="nav-item" active-class="active-route">
+      <img 
+        v-if="authStore.isLogged && authStore.user?.avatar" 
+        :src="authStore.user.avatar" 
+        alt="Avatar"
+        class="menu-avatar" />
+      <i v-else class="fas fa-user"></i>
+    </router-link>
   </nav>
 </template>
 
@@ -43,7 +52,7 @@ const cartStore = useCartStore()
   position: absolute;
   top: -8px;
   right: -10px;
-  background-color: var(--primary-color); /* Usa tu morado corporativo */
+  background-color: var(--primary-color);
   color: white;
   font-size: 0.65rem;
   font-family: var(--font-family);
@@ -54,6 +63,20 @@ const cartStore = useCartStore()
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.menu-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  /* border: 2px solid var(--primary-color, #42b983); */
+}
+
+.active-route i,
+.active-route span {
+  color: var(--primary-color, #42b983);
+  font-weight: bold;
 }
 </style>

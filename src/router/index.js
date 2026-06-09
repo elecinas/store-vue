@@ -5,6 +5,7 @@ import LoginView from "../views/LoginView.vue";
 import ProductView from "../views/ProductView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import PurchaseView from "../views/PurchaseView.vue";
+import { useAuthStore } from "../stores/auth.js";
 
 const routes = [
   { path: "/", component: HomeView },
@@ -28,14 +29,12 @@ const router = createRouter({
 //comprobamos si el usuario está autenticado
 //y adaptamos la navegación en consecuencia
 router.beforeEach((to, from, next) => {
-  const protectedRoute = to.matched.some((ruta) => ruta.meta.requiresAuth);
-  const authUser = !!localStorage.getItem("token");
+  const authStore = useAuthStore();
 
-  if (protectedRoute && !authUser) {
-    next({
-      path: "/login",
-      query: { redirect: to.fullPath },//guarda la dirección que puso el usuario
-    });
+  if (to.meta.requiresAuth && !authStore.isLogged) {
+    //guarda la ruta donde se dirigía originalmente 
+    //antes de redirigir a loguin
+    next({ path: "/login", query: { redirect: to.fullPath } });
   } else {
     next();
   }

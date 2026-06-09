@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
 import { useProducts } from '../composables/useProducts';
+import { getStarClass } from '../helpers/stars';
 
 const { products: apiProducts, limit: apiLimit, offset: apiOffset, total: apiTotal, error: apiError, loading: apiLoading, getProducts } = useProducts();
 
@@ -11,15 +12,6 @@ const updateListProducts = () => {
 
 onMounted(() => getProducts());
 
-const getStarClass = (rating, starIndex) => {
-    if (rating >= starIndex) {
-        return 'fas fa-star'; // Rellena
-    } else if (rating >= starIndex - 0.5) {
-        return 'fas fa-star-half-alt'; // Media rellena
-    } else {
-        return 'far fa-star'; // Vacía 
-    }
-};
 </script>
 <template>
     <h1 class="title-section">Products Store</h1>

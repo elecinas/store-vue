@@ -1,81 +1,31 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import useProductDetail from '../composables/useProductDetail';
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import useProductDetailPage from '../composables/useProductDetailPage';
 import { getStarClass } from '../helpers/stars';
 import { useCartStore } from '../stores/cart';
 
-const cartStore = useCartStore();
 const route = useRoute();
+const cartStore = useCartStore();
 
 const {
-    product: detailProduct,
-    loading: detailLoading,
-    error: detailError,
-    getProduct
-} = useProductDetail();
+    detailProduct,
+    detailLoading,
+    detailError,
+    relatedProducts,
+    relatedLoading,
+    loadPage
+} = useProductDetailPage();
 
-const relatedProducts = ref([]);
-const relatedLoading = ref(false);
-
-const fetchRelatedProducts = async (currentProduct) => {
-    if (!currentProduct || !currentProduct.category) return;
-    relatedLoading.value = true;
-    try {
-        const response = await fetch('http://localhost:3000/products?limit=50&offset=0');
-        if (response.ok) {
-            const data = await response.json();
-            const allProducts = data.items || [];
-            
-            //filtramos por categoria excluyendo el actual
-            const filtered = allProducts.filter(p =>
-                p.category === currentProduct.category && p.id !== currentProduct.id
-            );
-            
-            //mezclamos para que sean distintos los sugeridos cada vez
-            const shuffled = filtered.sort(() => Math.random() - 0.5);
-            //solo 3
-            relatedProducts.value = shuffled.slice(0, 3);
-        }
-    } catch (error) {
-        console.error("Error cargando productos relacionados:", error);
-    } finally {
-        relatedLoading.value = false;
-    }
-}
-
-// Repintamos la vista
-const loadComponentData = async (id) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' }); //mandamos el scroll para arriba
-    relatedProducts.value = [];//vaciamos productos relacionados
-    await getProduct(id);
-    if (detailProduct.value) {
-        await fetchRelatedProducts(detailProduct.value);
-    }
-}
-
-onMounted(async () => { 
-    await getProduct(route.params.id);
-    if (detailProduct.value) {
-        fetchRelatedProducts(detailProduct.value);
-    }
-})
-
-//observa cuando detailProduct ya ha obtenido dtos de la api
-watch(() => detailProduct.value, (newProduct) => {
-    if (newProduct && relatedProducts.value.length === 0) {
-        fetchRelatedProducts(newProduct);
-    }
-}, { deep: true });
+onMounted(() => {
+    loadPage(route.params.id);
+});
 
 //si clicas sobre producto relacionado
 //la url cambia y actualizamos el producto
-watch(() => route.params.id, async (newId) => {
+watch(() => route.params.id, (newId) => {
     if (newId) {
-        await getProduct(newId);
-        if (detailProduct.value) {
-            fetchRelatedProducts(detailProduct.value);
-        }
+        loadPage(newId);
     }
 });
 

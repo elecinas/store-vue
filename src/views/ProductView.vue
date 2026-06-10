@@ -1,11 +1,12 @@
 <script setup>
-import { onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import useProductDetail from '../composables/useProductDetail';
 import { getStarClass } from '../helpers/stars';
 import { useCartStore } from '../stores/cart';
 
-const cartStore = useCartStore()
+const cartStore = useCartStore();
+const route = useRoute();
 
 const {
     product: detailProduct,
@@ -14,9 +15,59 @@ const {
     getProduct
 } = useProductDetail();
 
-const route = useRoute();
+const relatedProducts = ref([]);
+const relatedLoading = ref(false);
 
-onMounted(() => getProduct(route.params.id));
+const fetchRelatedProducts = async (currentProduct) => {
+    if (!currentProduct || !currentProduct.category) return;
+    relatedLoading.value = true;
+    try {
+        const response = await fetch('http://localhost:3000/products?limit=50&offset=0');
+        if (response.ok) {
+            const data = await response.json();
+            const allProducts = data.items || [];
+            
+            //filtramos por categoria excluyendo el actual
+            const filtered = allProducts.filter(p =>
+                p.category === currentProduct.category && p.id !== currentProduct.id
+            );
+            
+            //mezclamos para que sean distintos los sugeridos cada vez
+            const shuffled = filtered.sort(() => Math.random() - 0.5);
+            //solo 3
+            relatedProducts.value = shuffled.slice(0, 3);
+        }
+    } catch (error) {
+        console.error("Error cargando productos relacionados:", error);
+    } finally {
+        relatedLoading.value = false;
+    }
+}
+
+onMounted(async () => { 
+    await getProduct(route.params.id);
+    if (detailProduct.value) {
+        fetchRelatedProducts(detailProduct.value);
+    }
+})
+
+//observa cuando detailProduct ya ha obtenido dtos de la api
+watch(() => detailProduct.value, (newProduct) => {
+    if (newProduct && relatedProducts.value.length === 0) {
+        fetchRelatedProducts(newProduct);
+    }
+}, { deep: true });
+
+//si clicas sobre producto relacionado
+//la url cambia y actualizamos el producto
+watch(() => route.params.id, async (newId) => {
+    if (newId) {
+        await getProduct(newId);
+        if (detailProduct.value) {
+            fetchRelatedProducts(detailProduct.value);
+        }
+    }
+});
 
 </script>
 <template>
@@ -57,6 +108,26 @@ onMounted(() => getProduct(route.params.id));
                 <div class="stock-status" :class="{ 'low-stock': detailProduct.stock <= 5 }">
                     <i class="fas fa-box"></i> 
                     <span>{{ detailProduct.stock > 0 ? `Stock disponible: ${detailProduct.stock} uds.` : 'Agotado' }}</span>
+                </div>
+            </div>
+
+            <div class="related-section" v-if="relatedProducts.length > 0">
+                <h3 class="related-section-title">Productos relacionados</h3>
+                <div class="related-grid">
+                    <router-link 
+                        v-for="rel in relatedProducts" 
+                        :key="rel.id" 
+                        :to="`/products/${rel.id}`" 
+                        class="related-card"
+                    >
+                        <div class="related-image-wrapper">
+                            <img :src="rel.imageUrl" :alt="rel.name" class="related-image" />
+                        </div>
+                        <div class="related-meta">
+                            <h4 class="related-card-title">{{ rel.name }}</h4>
+                            <span class="related-card-price">{{ rel.price }} €</span>
+                        </div>
+                    </router-link>
                 </div>
             </div>
 
@@ -146,7 +217,6 @@ onMounted(() => getProduct(route.params.id));
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
-    flex: 1;
 }
 
 .meta-row {
@@ -210,10 +280,84 @@ onMounted(() => getProduct(route.params.id));
     color: #dc3545;
 }
 
+/* ESTILOS DE LA NUEVA SECCIÓN DE RELACIONADOS (Alineados con la guía de estilo) */
+.related-section {
+    padding: 1.5rem;
+    border-top: 1px solid #f5f5f5;
+    background-color: #fafafa;
+    margin-bottom: 5rem; /* Margen extra para no colisionar con la barra fija inferior */
+}
+
+.related-section-title {
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.related-card {
+    background: #fff;
+    border: 1px solid #eef0f2;
+    border-radius: 12px;
+    padding: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.related-card:active {
+    transform: scale(0.97);
+}
+
+.related-image-wrapper {
+    width: 100%;
+    height: 90px;
+    background-color: #fdfdfd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.related-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.related-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.related-card-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.related-card-price {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #6f42c1;
+}
+
 /* Barra inferior de compra */
 .purchase-bar {
     position: sticky;
-    bottom: 0;
+    bottom: -1.1rem;
     margin-top: auto;
     background: white;
     border-top: 1px solid #eee;

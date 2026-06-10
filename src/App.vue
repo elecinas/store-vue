@@ -19,8 +19,8 @@ const authStore = useAuthStore()
     </router-link>
     <router-link to="/profile" class="nav-item" active-class="active-route">
       <img 
-        v-if="authStore.isLogged && authStore.user?.avatar" 
-        :src="authStore.user.avatar" 
+        v-if="authStore.isLogged && authStore.user?.profileImg" 
+        :src="authStore.user.profileImg" 
         alt="Avatar"
         class="menu-avatar" />
       <i v-else class="fas fa-user"></i>

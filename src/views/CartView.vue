@@ -21,7 +21,7 @@ onMounted(async () => {
         //Transformamos los items del carrito en el formato
         //que necesita la API para validar el carrito
         const formatCartItems = cartStore.items.map(item => ({
-            productId: item.id || item.productId || item._id,
+            productId: item.id,
             quantity: item.quantity
         }));
         const jsonItems = JSON.stringify(formatCartItems);
@@ -33,11 +33,25 @@ onMounted(async () => {
                 'Content-Type': 'application/json'
             }
         });
-        const serverData = await response.json().catch(() => ({}));
+
         if (!response.ok) {
+            const serverData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `Error del servidor (Status: ${response.status})`);
         }
+
+        const serverData = await response.json();
         console.log('✅ Carrito validado con éxito con el backend:', serverData);
+
+        //refresca los valores con lo devuelto por la api (por si acaso)
+        cartStore.items.forEach(localItem => {
+            const freshServerProduct = serverData.find(sp => sp.id === localItem.id);
+            if (freshServerProduct) {
+                localItem.price = freshServerProduct.price;
+                localItem.stock = freshServerProduct.stock;
+                localItem.name = freshServerProduct.name;
+                localItem.imageUrl = freshServerProduct.imageUrl;
+            }
+        });
     } catch (error) {
         validationError.value = error.message
     } finally {
@@ -51,7 +65,7 @@ const handleCheckout = async () => {
 
     try {
         const formatCartItems = cartStore.items.map(item => ({
-            productId: item.id || item.productId,
+            productId: item.id,
             quantity: item.quantity
         }));
 
@@ -67,21 +81,23 @@ const handleCheckout = async () => {
         });
 
         if (!response.ok) {
-            throw new Error("No se pudo completar la compra en el servidor.");
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Error en el servidor (Status: ${response.status})`);
         }
 
         const purchaseResult = await response.json();
-        console.log("Compra realizada con éxito:", purchaseResult);
+        console.log("✅ Compra realizada con éxito:", purchaseResult);
 
         //Vaciar carrito de Pinia
         cartStore.clearCart();
 
         //Recogemos el id de pedido que nos da la API
         //para ir a la página de pedido
-        const orderId = purchaseResult.id || purchaseResult.purchaseId || purchaseResult.data?.id || "success";
+        const orderId = purchaseResult.purchaseId;
         router.push(`/purchases/${orderId}`);
     } catch (error) {
-        alert(error.message)
+        console.error("Error en el Checkout:", error);
+        alert(error.message);
     } finally {
         isSubmiting.value = false;
     }

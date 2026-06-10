@@ -26,19 +26,22 @@ export const useAuthStore = defineStore("auth", () => {
       const resp = await fetch("http://localhost:3000/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username,
-          password,
-        }),
+        body: JSON.stringify({ username, password }),
       });
+
       if (!resp.ok) throw new Error("Credenciales inválidas");
+
       const data = await resp.json();
+
       token.value = data.token; 
       user.value = data.user || { name: username };
       isLogged.value = true;
+
       localStorage.setItem("token", token.value);
       localStorage.setItem("user", JSON.stringify(user.value));
+
       return true;
+      
     } catch (error) {
       console.error("Error en login: ", error);
       return false;

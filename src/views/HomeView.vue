@@ -1,35 +1,65 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted } from 'vue';
 import { useProducts } from '../composables/useProducts';
 import { getStarClass } from '../helpers/stars';
 
-const { products: apiProducts, limit: apiLimit, offset: apiOffset, total: apiTotal, error: apiError, loading: apiLoading, getProducts } = useProducts();
+const { 
+  products, 
+  loading, 
+  error, 
+  total, 
+  loadInitialProducts, 
+  loadMoreProducts 
+} = useProducts();
 
-const updateListProducts = () => {
-    apiOffset.value += 10;
-    getProducts();
-}
-
-onMounted(() => getProducts());
+onMounted(() => {
+  loadInitialProducts();
+});
 
 </script>
 <template>
-    <h1 class="title-section">Products Store</h1>
-    <p v-if="apiLoading">Cargando productos...</p>
-    <p v-else-if="apiError" class="error">Error: {{ apiError }}</p>
-    <div v-else class="products-container">
-        <router-link v-for="product in apiProducts" :key="product.id" :to="`/products/${product.id}`"
-            class="product-card">
-            <img :src="product.imageUrl" :alt="product.description" class="product-image">
-            <p class="product-title">{{ product.name }}</p>
-            <p class="product-price">${{ product.price }}</p>
-            <div class="product-rating">
-                <i v-for="n in 5" :key="n" :class="getStarClass(product.rating, n)" class="star-icon"></i>
-                <span class="rating-number">({{ product.rating }})</span>
-            </div>
-        </router-link>
+  <div class="home-view">
+    <div v-if="error" class="error-message">{{ error }}</div>
+    
+    <div class="products-container">
+      
+      <router-link 
+        v-for="product in products" 
+        :key="product.id" 
+        :to="`/products/${product.id}`" 
+        class="product-card"
+      >
+        <img :src="product.image || product.imageUrl" :alt="product.title" class="product-image" />
+        
+        <h2 class="product-title">{{ product.title }}</h2>
+        
+        <span class="product-price">{{ product.price }}€</span>
+        
+        <div class="product-rating">
+          <i 
+            v-for="n in 5" 
+            :key="n" 
+            :class="['star-icon', getStarClass(product.rating?.rate || product.rating, n)]"
+          ></i>
+          <span class="rating-number">
+            ({{ product.rating?.rate || product.rating || 0 }})
+          </span>
+        </div>
+      </router-link>
+
     </div>
-    <button v-if="apiProducts.length < apiTotal" @click="updateListProducts" type="button" class="btn">Show more products</button>
+
+    <div v-if="loading" class="spinner">Cargando productos...</div>
+
+    <button 
+      v-if="products.length < total" 
+      @click="loadMoreProducts" 
+      :disabled="loading"
+      class="btn btn-load-more"
+    >
+      {{ loading ? 'Cargando...' : 'Mostrar más' }}
+    </button>
+  </div>
 </template>
 
 <style scoped>

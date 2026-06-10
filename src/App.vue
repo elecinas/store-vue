@@ -38,7 +38,7 @@ const authStore = useAuthStore()
 .main {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1rem 1rem 4.5rem 1rem;
 }
 
 .nav-bar {
@@ -47,6 +47,15 @@ const authStore = useAuthStore()
   display: flex;
   justify-content: space-around;
   align-items: center;
+
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  width: 430px;
+  margin: 0 auto;
+  transform: translate(-50%);
+  z-index: 1000;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Unificamos el estilo base de los botones para quitar el has-color-light */

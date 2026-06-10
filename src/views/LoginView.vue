@@ -1,26 +1,7 @@
 <script setup>
-import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { useLogin } from '../composables/useLogin';
 
-const authStore = useAuthStore();
-const route = useRoute();
-const router = useRouter();
-
-const username = ref('');
-const password = ref('');
-const errorMessage = ref('');
-
-const handleSubmit = async () => {
-    errorMessage.value = '';
-    const success = await authStore.login(username.value, password.value);
-    if(success){
-        const redirectPath = route.query.redirect || '/';
-        router.push(redirectPath);
-    } else {
-        errorMessage.value = 'Usuario o contraseña incorrectos';
-    }
-}
+const { username, password, errorMessage, handleSubmit } = useLogin();
 </script>
 
 <template>

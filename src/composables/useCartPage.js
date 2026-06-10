@@ -5,7 +5,6 @@ import { useAuthStore } from "../stores/auth";
 import { validateCartAPI, purchaseCartAPI } from "../services/cartService";
 
 export default function useCartPage() {
-
   const cartStore = useCartStore();
   const authStore = useAuthStore();
   const router = useRouter();
@@ -15,7 +14,6 @@ export default function useCartPage() {
   const isSubmitting = ref(false);
 
   const validateCart = async () => {
-
     if (cartStore.items.length === 0) {
       validationInProcess.value = false;
       return;
@@ -26,14 +24,14 @@ export default function useCartPage() {
 
       const serverData = await validateCartAPI(
         cartStore.items,
-        authStore.token
+        authStore.token,
       );
 
       console.log("✅ carrito validado", serverData);
 
       // sincronizar datos con backend
-      cartStore.items.forEach(localItem => {
-        const fresh = serverData.find(sp => sp.id === localItem.id);
+      cartStore.items.forEach((localItem) => {
+        const fresh = serverData.find((sp) => sp.id === localItem.id);
 
         if (fresh) {
           localItem.price = fresh.price;
@@ -42,7 +40,6 @@ export default function useCartPage() {
           localItem.imageUrl = fresh.imageUrl;
         }
       });
-
     } catch (error) {
       validationError.value = error.message;
     } finally {
@@ -51,24 +48,20 @@ export default function useCartPage() {
   };
 
   const handleCheckout = async () => {
-
     if (cartStore.items.length === 0) return;
-
     isSubmitting.value = true;
 
     try {
       const purchaseResult = await purchaseCartAPI(
         cartStore.items,
-        authStore.token
+        authStore.token,
       );
 
       console.log("✅ compra realizada", purchaseResult);
-
       cartStore.clearCart();
 
       const orderId = purchaseResult.purchaseId;
       router.push(`/purchases/${orderId}`);
-
     } catch (error) {
       console.error("Error checkout:", error);
       alert(error.message);

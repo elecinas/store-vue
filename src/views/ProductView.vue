@@ -44,6 +44,16 @@ const fetchRelatedProducts = async (currentProduct) => {
     }
 }
 
+// Repintamos la vista
+const loadComponentData = async (id) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' }); //mandamos el scroll para arriba
+    relatedProducts.value = [];//vaciamos productos relacionados
+    await getProduct(id);
+    if (detailProduct.value) {
+        await fetchRelatedProducts(detailProduct.value);
+    }
+}
+
 onMounted(async () => { 
     await getProduct(route.params.id);
     if (detailProduct.value) {
@@ -102,7 +112,6 @@ watch(() => route.params.id, async (newId) => {
                 </div>
 
                 <h1 class="product-title">{{ detailProduct.name }}</h1>
-                
                 <p class="product-description">{{ detailProduct.description }}</p>
                 
                 <div class="stock-status" :class="{ 'low-stock': detailProduct.stock <= 5 }">
@@ -111,9 +120,14 @@ watch(() => route.params.id, async (newId) => {
                 </div>
             </div>
 
-            <div class="related-section" v-if="relatedProducts.length > 0">
+            <div class="related-section">
                 <h3 class="related-section-title">Productos relacionados</h3>
-                <div class="related-grid">
+                
+                <div v-if="relatedLoading" class="related-loading">
+                    <p>Buscando recomendaciones...</p>
+                </div>
+
+                <div v-else-if="relatedProducts.length > 0" class="related-grid">
                     <router-link 
                         v-for="rel in relatedProducts" 
                         :key="rel.id" 
@@ -128,6 +142,10 @@ watch(() => route.params.id, async (newId) => {
                             <span class="related-card-price">{{ rel.price }} €</span>
                         </div>
                     </router-link>
+                </div>
+
+                <div v-else class="related-empty">
+                    <p>No hay otros productos disponibles en esta categoría en este momento.</p>
                 </div>
             </div>
 
@@ -169,6 +187,7 @@ watch(() => route.params.id, async (newId) => {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    text-decoration: none;
 }
 
 .back-link:hover {
@@ -280,12 +299,12 @@ watch(() => route.params.id, async (newId) => {
     color: #dc3545;
 }
 
-/* ESTILOS DE LA NUEVA SECCIÓN DE RELACIONADOS (Alineados con la guía de estilo) */
+/* SECCIÓN DE RELACIONADOS */
 .related-section {
     padding: 1.5rem;
     border-top: 1px solid #f5f5f5;
     background-color: #fafafa;
-    margin-bottom: 5rem; /* Margen extra para no colisionar con la barra fija inferior */
+    margin-bottom: 6rem; /* Margen extra para no colisionar con la barra fija inferior */
 }
 
 .related-section-title {
@@ -293,6 +312,13 @@ watch(() => route.params.id, async (newId) => {
     color: var(--dark);
     margin: 0 0 1rem 0;
     font-weight: 700;
+}
+
+.related-loading, .related-empty {
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--grey);
+    text-align: center;
 }
 
 .related-grid {
@@ -392,9 +418,19 @@ watch(() => route.params.id, async (newId) => {
     border-radius: 12px;
     font-size: 0.95rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(196, 114, 185, 0.3);
-    transition: transform 0.2s;
+    background-color: #6f42c1;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.purchase-btn:hover {
+    background-color: #5a32a3;
 }
 
 .purchase-btn:active {
@@ -402,7 +438,7 @@ watch(() => route.params.id, async (newId) => {
 }
 
 .purchase-btn:disabled {
-    background-color: var(--grey-light);
+    background-color: #ccc;
     box-shadow: none;
     cursor: not-allowed;
 }

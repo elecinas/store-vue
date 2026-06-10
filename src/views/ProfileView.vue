@@ -1,12 +1,15 @@
 <script setup>
 import { useAuthStore } from '../stores/auth';
+import { useCartStore } from '../stores/cart';
 import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
+const cartStore = useCartStore();
 const router = useRouter();
 
 const handleLogout = () => {
     authStore.logout();
+    cartStore.clearCart();
     router.push('/login');
 }
 

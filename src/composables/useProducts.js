@@ -1,14 +1,13 @@
 import { ref } from "vue";
 
+const products = ref([]);
+const limit = ref(10);
+const offset = ref(0);
+const total = ref(0);
+const error = ref(null);
+const loading = ref(true);
+
 export function useProducts() {
-
-  const products = ref([]);
-  const limit = ref(10);
-  const offset = ref(0);
-  const total = ref(0);
-  const error = ref(null);
-  const loading = ref(true);
-
   const getProducts = async () => {
     try {
       const res = await fetch(
@@ -16,6 +15,7 @@ export function useProducts() {
       );
       if (!res.ok) throw new Error("Error en la petición del servidor");
       const resJson = await res.json();
+      //evita duplicados
       const moreProducts = resJson.items.filter(
         (product) => !products.value.some((p) => p.id === product.id),
       );

@@ -30,7 +30,7 @@ export const useCartStore = defineStore("cart", () => {
   })
 
   const clearCart = () => {
-    items.value = []
+    items.value = [];
   }
 
   return {

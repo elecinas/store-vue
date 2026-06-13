@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { loginAPI } from "../services/authService";
 
 export const useAuthStore = defineStore("auth", () => {
   const token = ref(localStorage.getItem("token") || "");
@@ -23,15 +24,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   const login = async (username, password) => {
     try {
-      const resp = await fetch("http://localhost:3000/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!resp.ok) throw new Error("Credenciales inválidas");
-
-      const data = await resp.json();
+      const data = await loginAPI(username, password);
 
       token.value = data.token; 
       user.value = data.user || { name: username };

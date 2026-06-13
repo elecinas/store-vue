@@ -43,26 +43,20 @@ export function usePurchase() {
       }
 
       const enrichedItems = data.items.map((item) => {
-        //mirar si el producto existe en la lista general
-        let productInfo = allProducts.find(
+        const productInfo = allProducts.find(
           (p) => String(p.id).trim() === String(item.productId).trim(),
         );
 
-        // al hacer pruebas se han detectado productos no existentes 
-        // en el listado del pedido, así que
-        // Si el backend nos ha dado un id erróneo
-        // cogemos el producto de la misma posición (para que no se vea roto)
-        if (!productInfo && allProducts.length > 0) {
-          const productIndex = parseInt(item.productId, 10) % allProducts.length;
-          productInfo = allProducts[isNaN(productIndex) ? 0 : productIndex];
-        }
-
         return {
           ...item,
-          name: productInfo ? productInfo.name : "Producto Premium",
+          // Si no existe, al menos le decimos al usuario qué ID tenía para que no quede tan genérico
+          name: productInfo
+            ? productInfo.name
+            : `Producto ID: ${item.productId} (Descatalogado)`,
+          // Usamos un SVG en base64 o una imagen placeholder elegante para que no pinte el recuadro roto de HTML
           imageUrl: productInfo
             ? productInfo.imageUrl
-            : "https://placehold.co/55x55/e2e8f0/475569?text=Shop",
+            : "https://placehold.co/55x55/e2e8f0/475569?text=N/A",
         };
       });
 

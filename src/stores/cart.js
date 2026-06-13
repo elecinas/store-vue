@@ -1,8 +1,43 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import { fetchProductsAPI } from "../services/productService";
 
 export const useCartStore = defineStore("cart", () => {
-  const items = ref([]);
+  //estado
+  const items = ref([]); 
+  const allProducts = ref([]);
+
+  const fetchGlobalProducts = async () => {
+    try {
+      allProducts.value = await fetchProductsAPI();
+    } catch (error) {
+      console.error('Error cargando el stock global:', error.message);
+    }
+  };
+
+  const validateAndFilterStock = () => {
+    const insufficientItems = [];
+    const validItems = [];
+
+    for (const item of items.value) {
+      const productInCatalog = allProducts.value.find(
+        (p) => String(p.id).trim() === String(item.id).trim() 
+      );
+
+      if (!productInCatalog || item.quantity > productInCatalog.stock) {
+        insufficientItems.push(item.id);
+      } else {
+        validItems.push(item);
+      }
+    }
+
+    if (insufficientItems.length > 0) {
+      items.value = validItems;
+      return { success: false, insufficientItems };
+    }
+
+    return { success: true, insufficientItems: [] };
+  };
 
   const addProduct = (product) => {
     const existProduct = items.value.find((item) => item.id === product.id);
@@ -46,6 +81,9 @@ export const useCartStore = defineStore("cart", () => {
 
   return {
     items,
+    allProducts,
+    fetchGlobalProducts,
+    validateAndFilterStock,
     addProduct,
     decrementProduct,
     removeProduct,

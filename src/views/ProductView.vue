@@ -9,9 +9,9 @@ const route = useRoute();
 const cartStore = useCartStore();
 
 const {
-    detailProduct,
-    detailLoading,
-    detailError,
+    product,
+    loading,
+    error,
     relatedProducts,
     relatedLoading,
     loadPage
@@ -36,31 +36,31 @@ watch(() => route.params.id, (newId) => {
             <router-link to="/" class="back-link">
                 <i class="fas fa-arrow-left"></i> Volver a la tienda
             </router-link>
-            <span v-if="detailProduct" class="category-badge">{{ detailProduct.category }}</span>
+            <span v-if="product" class="category-badge">{{ product.category }}</span>
         </div>
-        <div v-if="detailLoading" class="status-container">
+        <div v-if="loading" class="status-container">
             <p class="loading-text">Cargando datos...</p>
         </div>
-        <div v-else-if="detailError" class="status-container">
-            <p class="error">{{ detailError }}</p>
+        <div v-else-if="error" class="status-container">
+            <p class="error">{{ error }}</p>
         </div>
         <div v-else class="detail-content">
             <div class="image-wrapper">
-                <img :src="detailProduct.imageUrl" :alt="detailProduct.name" class="detail-image" />
+                <img :src="product.imageUrl" :alt="product.name" class="detail-image" />
             </div>
             <div class="info-wrapper">
                 <div class="meta-row">
-                    <span class="product-brand">{{ detailProduct.brand }}</span>
+                    <span class="product-brand">{{ product.brand }}</span>
                     <div class="product-rating">
-                        <i v-for="n in 5" :key="n" :class="getStarClass(detailProduct.rating, n)" class="star-icon"></i>
-                        <span class="rating-number">({{ detailProduct.rating }})</span>
+                        <i v-for="n in 5" :key="n" :class="getStarClass(product.rating, n)" class="star-icon"></i>
+                        <span class="rating-number">({{ product.rating }})</span>
                     </div>
                 </div>
-                <h1 class="product-title">{{ detailProduct.name }}</h1>
-                <p class="product-description">{{ detailProduct.description }}</p>
-                <div class="stock-status" :class="{ 'low-stock': detailProduct.stock <= 5 }">
+                <h1 class="product-title">{{ product.name }}</h1>
+                <p class="product-description">{{ product.description }}</p>
+                <div class="stock-status" :class="{ 'low-stock': product.stock <= 5 }">
                     <i class="fas fa-box"></i> 
-                    <span>{{ detailProduct.stock > 0 ? `Stock disponible: ${detailProduct.stock} uds.` : 'Agotado' }}</span>
+                    <span>{{ product.stock > 0 ? `Stock disponible: ${product.stock} uds.` : 'Agotado' }}</span>
                 </div>
             </div>
             <div class="related-section">
@@ -91,9 +91,9 @@ watch(() => route.params.id, (newId) => {
             <div class="purchase-bar">
                 <div class="price-container">
                     <span class="price-label">Precio</span>
-                    <span class="product-price">{{ detailProduct.price }} €</span>
+                    <span class="product-price">{{ product.price }} €</span>
                 </div>
-                <button @click="cartStore.addProduct(detailProduct)" class="btn btn--cta purchase-btn" :disabled="detailProduct.stock <= 0">
+                <button @click="cartStore.addProduct(product)" class="btn btn--cta purchase-btn" :disabled="product.stock <= 0">
                     <i class="fas fa-shopping-cart"></i> Añadir al carrito
                 </button>
             </div>

@@ -1,13 +1,10 @@
 import { ref } from "vue";
-import useProductDetail from "./useProductDetail";
+import { getProduct } from "../services/productService";
 
 export default function useProductDetailPage() {
-  const {
-    product: detailProduct,
-    loading: detailLoading,
-    error: detailError,
-    getProduct,
-  } = useProductDetail();
+  const product = ref(null);
+  const loading = ref(true);
+  const error = ref(null);
 
   const relatedProducts = ref([]);
   const relatedLoading = ref(false);
@@ -46,18 +43,18 @@ export default function useProductDetailPage() {
   };
 
   const loadPage = async (id) => {
-    await getProduct(id);
+    product.value = await getProduct(id);
+    loading.value = false;
 
-    if (detailProduct.value) {
-      await fetchRelatedProducts(detailProduct.value);
+    if (product.value) {
+      await fetchRelatedProducts(product.value);
     }
   };
 
   return {
-    detailProduct,
-    detailLoading,
-    detailError,
-    getProduct,
+    product,
+    loading,
+    error,
 
     relatedProducts,
     relatedLoading,

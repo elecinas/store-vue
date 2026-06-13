@@ -3,7 +3,7 @@ import { useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { fetchOrderDetailsAPI } from "../services/purchaseService";
 
-export function usePurchase() {
+export function usePurchasePage() {
   const route = useRoute();
   const authStore = useAuthStore();
 

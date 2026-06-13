@@ -1,5 +1,5 @@
 <script setup>
-import { usePurchase } from '../composables/usePurchase';
+import { usePurchasePage } from '../composables/usePurchasePage';
 import { formatDate } from '../helpers/date';
 
 const { 
@@ -8,7 +8,7 @@ const {
     loading, 
     error,
     orderTotal
-} = usePurchase();
+} = usePurchasePage();
 </script>
 
 <template>

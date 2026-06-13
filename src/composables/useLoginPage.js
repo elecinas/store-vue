@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 
-export function useLogin() {
+export function useLoginPage() {
   const authStore = useAuthStore();
   const route = useRoute();
   const router = useRouter();

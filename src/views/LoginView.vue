@@ -1,7 +1,7 @@
 <script setup>
-import { useLogin } from '../composables/useLogin';
+import { useLoginPage } from '../composables/useLoginPage';
 
-const { username, password, errorMessage, handleSubmit } = useLogin();
+const { username, password, errorMessage, handleSubmit } = useLoginPage();
 </script>
 
 <template>

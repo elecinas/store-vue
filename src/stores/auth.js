@@ -1,52 +1,51 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { loginAPI } from "../services/authService";
+import { 
+  loginAPI, 
+  getAuthToken, setAuthToken, removeAuthToken, 
+  getAuthUser, setAuthUser, removeAuthUser,
+  isValidToken
+} from "../services/authService";
 
 export const useAuthStore = defineStore("auth", () => {
-  const token = ref(localStorage.getItem("token") || "");
-  const isLogged = ref(false);
-  const user = ref(null);
+ const token = ref(getAuthToken());
+  const user = ref(getAuthUser());
+  const isLogged = ref(isValidToken(token.value));
 
-  // Por si se ha guardado un informacion anterior
-  try {
-    const savedUser = localStorage.getItem("user");
-    user.value = savedUser && savedUser !== "undefined" ? JSON.parse(savedUser) : null;
-  } catch (e) {
-    user.value = null;
-  }
-
-  if (token.value && token.value !== "undefined" && token.value !== "238") {
-    isLogged.value = true;
-  } else {
+  if (!isLogged.value) {
     token.value = "";
-    isLogged.value = false;
   }
 
   const login = async (username, password) => {
     try {
       const data = await loginAPI(username, password);
 
+      // actualiza estado
       token.value = data.token; 
       user.value = data.user || { name: username };
       isLogged.value = true;
 
-      localStorage.setItem("token", token.value);
-      localStorage.setItem("user", JSON.stringify(user.value));
+      //persiste datos
+      setAuthToken(token.value);
+      setAuthUser(user.value);
 
       return true;
       
     } catch (error) {
-      console.error("Error en login: ", error);
+      console.error("error de login: ", error);
       return false;
     }
   };
 
   const logout = () => {
+    //limpia estado
     isLogged.value = false;
     token.value = "";
     user.value = null;
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    
+    //limpia persistencia
+    removeAuthToken();
+    removeAuthUser();
   };
 
   return {

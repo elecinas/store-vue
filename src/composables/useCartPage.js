@@ -30,14 +30,14 @@ export default function useCartPage() {
       console.log("carrito validado", serverData);
 
       // sincroniza con back
-      cartStore.items.forEach((localItem) => {
-        const fresh = serverData.find((sp) => sp.id === localItem.id);
+      cartStore.items.forEach((currentItem) => {
+        const fresh = serverData.find((sp) => sp.id === currentItem.id);
 
         if (fresh) {
-          localItem.price = fresh.price;
-          localItem.stock = fresh.stock;
-          localItem.name = fresh.name;
-          localItem.imageUrl = fresh.imageUrl;
+          currentItem.price = fresh.price;
+          currentItem.stock = fresh.stock;
+          currentItem.name = fresh.name;
+          currentItem.imageUrl = fresh.imageUrl;
         }
       });
     } catch (error) {

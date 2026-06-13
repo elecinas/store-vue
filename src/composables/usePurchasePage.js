@@ -27,7 +27,7 @@ export function usePurchasePage() {
 
       if (!Array.isArray(allProducts)) {
         throw new Error(
-          "No se pudo encontrar la lista de productos en la respuesta del servidor.",
+          "No se ha encontrado lista de productos.",
         );
       }
 
@@ -51,9 +51,9 @@ export function usePurchasePage() {
 
       data.items = enrichedItems;
       orderDetails.value = data;
-    } catch (err) {
-      error.value = err.message;
-      console.error("Error cargando el pedido:", err);
+    } catch (e) {
+      error.value = e.message;
+      console.error("Error cargando el pedido:", e);
     } finally {
       loading.value = false;
     }

@@ -1,9 +1,3 @@
-/**
- * para obtener detalles de compra.
- * @param {string} purchaseId - ID compra
- * @param {string} token - Token usuario
- * @returns {Promise<Object>} - datos devueltos por el bakc
- */
 export const fetchOrderDetailsAPI = async (purchaseId, token) => {
     const response = await fetch(`http://localhost:3000/cart/purchases/${purchaseId}`, {
         method: "GET",
@@ -30,7 +24,7 @@ export const fetchUserPurchasesAPI = async (token) => {
   });
 
   if (!response.ok) {
-    throw new Error("No se pudo recuperar el historial de compras");
+    throw new Error("No se ha podido cargar el historial");
   }
 
   return response.json();

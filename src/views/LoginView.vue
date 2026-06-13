@@ -6,7 +6,7 @@ const { username, password, errorMessage, handleSubmit } = useLogin();
 
 <template>
   <div class="login-view">
-    <h1 class="title-section">Iniciar Sesión</h1>
+    <h1 class="title-section">Inicio de sesión</h1>
     <form @submit.prevent="handleSubmit" class="login-form">
       <div class="form-group">
         <label for="username">Usuario:</label>

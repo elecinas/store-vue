@@ -27,17 +27,17 @@ onMounted(() => {
         :to="`/products/${product.id}`" 
         class="product-card"
       >
-        <img :src="product.image || product.imageUrl" :alt="product.title" class="product-image" /> 
+        <img :src="product.imageUrl" :alt="product.title" class="product-image" /> 
         <h2 class="product-title">{{ product.title }}</h2>
         <span class="product-price">{{ product.price }}€</span>
         <div class="product-rating">
           <i 
             v-for="n in 5" 
             :key="n" 
-            :class="['star-icon', getStarClass(product.rating?.rate || product.rating, n)]"
+            :class="['star-icon', getStarClass(product.rating, n)]"
           ></i>
           <span class="rating-number">
-            ({{ product.rating?.rate || product.rating || 0 }})
+            ({{ product.rating || 0 }})
           </span>
         </div>
       </router-link>

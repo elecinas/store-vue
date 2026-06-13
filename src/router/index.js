@@ -32,7 +32,7 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
 
   if (to.meta.requiresAuth && !authStore.isLogged) {
-    //guarda la ruta donde se dirigía originalmente 
+    //guarda la ruta donde se dirigia originalmente 
     //antes de redirigir a loguin
     next({ path: "/login", query: { redirect: to.fullPath } });
   } else {

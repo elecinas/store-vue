@@ -1,21 +1,21 @@
 <script setup>
 import { usePurchase } from '../composables/usePurchase';
+import { formatDate } from '../helpers/date';
 
 const { 
     purchaseId, 
     orderDetails, 
     loading, 
     error,
-    formatDate,
     orderTotal
 } = usePurchase();
 </script>
 
 <template>
     <div class="purchase-view">
-        <h1 class="page-title">Purchase Details</h1>   
+        <h1 class="page-title">Detalles de compra</h1>   
         <div v-if="loading" class="loading-state">
-            <p>Loading order details...</p>
+            <p>Cargando detalles de compra...</p>
         </div>
         <div v-else-if="error" class="error-state">
             <p>{{ error }}</p>
@@ -23,11 +23,11 @@ const {
         <div v-else-if="orderDetails" class="order-content">
             <div class="info-card">
                 <p class="info-row">
-                    <span class="label">Order ID:</span> 
+                    <span class="label">Id de compra:</span> 
                     <span class="value">{{ purchaseId }}</span>
                 </p>
                 <p class="info-row">
-                    <span class="label">Date:</span> 
+                    <span class="label">Fecha:</span> 
                     <span class="value">{{ formatDate(orderDetails.purchaseDate) }}</span>
                 </p>
             </div>

@@ -39,7 +39,7 @@ watch(() => route.params.id, (newId) => {
             <span v-if="detailProduct" class="category-badge">{{ detailProduct.category }}</span>
         </div>
         <div v-if="detailLoading" class="status-container">
-            <p class="loading-text">Cargando producto...</p>
+            <p class="loading-text">Cargando datos...</p>
         </div>
         <div v-else-if="detailError" class="status-container">
             <p class="error">{{ detailError }}</p>
@@ -66,7 +66,7 @@ watch(() => route.params.id, (newId) => {
             <div class="related-section">
                 <h3 class="related-section-title">Productos relacionados</h3>
                 <div v-if="relatedLoading" class="related-loading">
-                    <p>Buscando recomendaciones...</p>
+                    <p>Buscando...</p>
                 </div>
                 <div v-else-if="relatedProducts.length > 0" class="related-grid">
                     <router-link 
@@ -85,7 +85,7 @@ watch(() => route.params.id, (newId) => {
                     </router-link>
                 </div>
                 <div v-else class="related-empty">
-                    <p>No hay otros productos disponibles de esta categoria.</p>
+                    <p>No hay más productos de esta categoria.</p>
                 </div>
             </div>
             <div class="purchase-bar">

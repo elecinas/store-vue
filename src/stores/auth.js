@@ -7,7 +7,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isLogged = ref(false);
   const user = ref(null);
 
-  // Por si se ha guardado un información anterior no válida
+  // Por si se ha guardado un informacion anterior
   try {
     const savedUser = localStorage.getItem("user");
     user.value = savedUser && savedUser !== "undefined" ? JSON.parse(savedUser) : null;

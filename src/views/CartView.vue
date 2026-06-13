@@ -15,7 +15,7 @@ const {
     <div class="cart-view">
         <h1 class="title-section">Mi Carrito</h1>
         <div v-if="validationInProcess" class="loading-state">
-            <p>Validando productos con el servidor...</p>
+            <p>Validando productos...</p>
         </div>
 
         <div v-else-if="validationError" class="error-state">
@@ -24,7 +24,7 @@ const {
 
         <div v-else-if="cartStore.items.length === 0" class="empty-cart">
             <i class="fas fa-shopping-basket empty-icon"></i>
-            <p>Tu carrito está vacío</p>
+            <p>Carrito vacío</p>
             <router-link to="/" class="btn btn--cta start-shopping">Ir a la tienda</router-link>
         </div>
 

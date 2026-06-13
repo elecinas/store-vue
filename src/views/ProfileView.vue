@@ -1,12 +1,12 @@
 <script setup>
-import { useProfilePage } from '../composables/useProfilePage'; // Ajusta la ruta según tus carpetas
+import { useProfilePage } from '../composables/useProfilePage';
+import { formatDate } from '../helpers/date';
 
 const { 
   authStore, 
   purchases, 
   isLoadingOrders, 
-  handleLogout, 
-  formatDate 
+  handleLogout
 } = useProfilePage();
 </script>
 
@@ -29,7 +29,7 @@ const {
       <div class="profile-body">
         <div class="info-section">
           <h3>Sobre mí</h3>
-          <p class="user-bio">{{ authStore.user.bio || 'Este usuario aún no ha escrito ninguna biografía.' }}</p>
+          <p class="user-bio">{{ authStore.user.bio || 'Aún no se ha escrito la biografia' }}</p>
         </div>
         <div class="info-meta">
           <div class="meta-item">
@@ -66,7 +66,7 @@ const {
           >
             <div class="order-info">
               <span class="order-id">Pedido #{{ order.purchaseId || order.id }}</span>
-              <span class="order-items">{{ order.items ? order.items.length : 0 }} artículo(s)</span>
+              <span class="order-items">{{ order.items ? order.items.length : 0 }} articulo(s)</span>
             </div>
             <i class="fas fa-chevron-right chevron-icon"></i>
           </router-link>
@@ -74,14 +74,14 @@ const {
       </div>
       <div class="profile-actions">
         <button @click="handleLogout" class="btn btn-logout">
-          <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+          <i class="fas fa-sign-out-alt"></i> Cierra la sesión
         </button>
       </div>
     </div>
   </div>
   
   <div v-else class="profile-loading">
-    <p>Cargando datos del perfil...</p>
+    <p>Cargando datos...</p>
   </div>
 </template>
 

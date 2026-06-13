@@ -18,21 +18,15 @@ export function useProfilePage() {
     router.push("/login");
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return new Date(dateString).toLocaleDateString("es-ES", options);
-  };
-
   onMounted(async () => {
     if (authStore.token) {
       try {
         const data = await fetchUserPurchasesAPI(authStore.token);
         purchases.value = Array.isArray(data)
           ? data
-          : data.purchases || data.orders || data.items || data.data || [];
+          : data.purchases || [];
       } catch (error) {
-        console.error("Error cargando el historial de pedidos:", error);
+        console.error("Error al cargar pedidos:", error);
       } finally {
         isLoadingOrders.value = false;
       }
@@ -43,6 +37,5 @@ export function useProfilePage() {
     purchases,
     isLoadingOrders,
     handleLogout,
-    formatDate,
   };
 }

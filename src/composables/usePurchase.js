@@ -12,17 +12,6 @@ export function usePurchase() {
   const loading = ref(true);
   const error = ref(null);
 
-  // formato fecha: "February 22, 2026"
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
   onMounted(async () => {
     loading.value = true;
     error.value = null;
@@ -49,11 +38,11 @@ export function usePurchase() {
 
         return {
           ...item,
-          // Si no existe, al menos le decimos al usuario qué ID tenía para que no quede tan genérico
+          // Si no existe, ponemos el id
           name: productInfo
             ? productInfo.name
             : `Producto ID: ${item.productId} (Descatalogado)`,
-          // Usamos un SVG en base64 o una imagen placeholder elegante para que no pinte el recuadro roto de HTML
+          // poner imagen generica si no hay imagen
           imageUrl: productInfo
             ? productInfo.imageUrl
             : "https://placehold.co/55x55/e2e8f0/475569?text=N/A",
@@ -75,6 +64,5 @@ export function usePurchase() {
     orderDetails,
     loading,
     error,
-    formatDate,
   };
 }

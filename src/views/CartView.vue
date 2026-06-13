@@ -102,12 +102,10 @@ const {
     flex-direction: column;
     gap: 1rem;
     overflow-y: auto;
-    max-height: 280px;
-    /* Ajuste para que no desborde el contenedor del App.vue */
+    flex: 1;
     padding-right: 4px;
 }
 
-/* Tarjeta de producto individual */
 .cart-item-card {
     display: flex;
     align-items: center;
@@ -166,6 +164,7 @@ const {
     gap: 0.7rem;
     border: 1px solid #eee;
     margin-top: auto;
+    margin-bottom: 48px;
 }
 
 .summary-row {

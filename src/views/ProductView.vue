@@ -22,7 +22,7 @@ onMounted(() => {
 });
 
 //si clicas sobre producto relacionado
-//la url cambia y actualizamos el producto
+//la url cambia y actualiza el producto
 watch(() => route.params.id, (newId) => {
     if (newId) {
         loadPage(newId);
@@ -38,20 +38,16 @@ watch(() => route.params.id, (newId) => {
             </router-link>
             <span v-if="detailProduct" class="category-badge">{{ detailProduct.category }}</span>
         </div>
-
         <div v-if="detailLoading" class="status-container">
             <p class="loading-text">Cargando producto...</p>
         </div>
-        
         <div v-else-if="detailError" class="status-container">
             <p class="error">{{ detailError }}</p>
         </div>
-
         <div v-else class="detail-content">
             <div class="image-wrapper">
                 <img :src="detailProduct.imageUrl" :alt="detailProduct.name" class="detail-image" />
             </div>
-
             <div class="info-wrapper">
                 <div class="meta-row">
                     <span class="product-brand">{{ detailProduct.brand }}</span>
@@ -60,23 +56,18 @@ watch(() => route.params.id, (newId) => {
                         <span class="rating-number">({{ detailProduct.rating }})</span>
                     </div>
                 </div>
-
                 <h1 class="product-title">{{ detailProduct.name }}</h1>
                 <p class="product-description">{{ detailProduct.description }}</p>
-                
                 <div class="stock-status" :class="{ 'low-stock': detailProduct.stock <= 5 }">
                     <i class="fas fa-box"></i> 
                     <span>{{ detailProduct.stock > 0 ? `Stock disponible: ${detailProduct.stock} uds.` : 'Agotado' }}</span>
                 </div>
             </div>
-
             <div class="related-section">
                 <h3 class="related-section-title">Productos relacionados</h3>
-                
                 <div v-if="relatedLoading" class="related-loading">
                     <p>Buscando recomendaciones...</p>
                 </div>
-
                 <div v-else-if="relatedProducts.length > 0" class="related-grid">
                     <router-link 
                         v-for="rel in relatedProducts" 
@@ -93,12 +84,10 @@ watch(() => route.params.id, (newId) => {
                         </div>
                     </router-link>
                 </div>
-
                 <div v-else class="related-empty">
-                    <p>No hay otros productos disponibles en esta categoría en este momento.</p>
+                    <p>No hay otros productos disponibles de esta categoria.</p>
                 </div>
             </div>
-
             <div class="purchase-bar">
                 <div class="price-container">
                     <span class="price-label">Precio</span>
@@ -153,7 +142,7 @@ watch(() => route.params.id, (newId) => {
     font-weight: 500;
 }
 
-/* Pantallas de estado */
+/*pantallas de estado */
 .status-container {
     flex: 1;
     display: grid;
@@ -161,7 +150,7 @@ watch(() => route.params.id, (newId) => {
     padding: 2rem;
 }
 
-/* Contenido Principal */
+/*contenido rincipal */
 .detail-content {
     display: flex;
     flex-direction: column;
@@ -202,7 +191,7 @@ watch(() => route.params.id, (newId) => {
     font-weight: 600;
 }
 
-/* Valoraciones */
+/* valoraciones */
 .product-rating {
     display: flex;
     align-items: center;
@@ -221,7 +210,7 @@ watch(() => route.params.id, (newId) => {
     font-weight: 500;
 }
 
-/* Textos */
+/* textos */
 .product-title {
     font-size: 1.4rem;
     color: var(--dark);
@@ -249,12 +238,12 @@ watch(() => route.params.id, (newId) => {
     color: #dc3545;
 }
 
-/* SECCIÓN DE RELACIONADOS */
+/* SECCION DE RELACIONADOS */
 .related-section {
     padding: 1.5rem;
     border-top: 1px solid #f5f5f5;
     background-color: #fafafa;
-    margin-bottom: 6rem; /* Margen extra para no colisionar con la barra fija inferior */
+    margin-bottom: 6rem;
 }
 
 .related-section-title {
@@ -330,7 +319,7 @@ watch(() => route.params.id, (newId) => {
     color: #6f42c1;
 }
 
-/* Barra inferior de compra */
+/* barra compra */
 .purchase-bar {
     position: sticky;
     bottom: -1.1rem;

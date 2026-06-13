@@ -32,15 +32,19 @@ const {
             <div class="cart-items-list">
                 <div v-for="item in cartStore.items" :key="item.id" class="cart-item-card">
                     <img :src="item.imageUrl" :alt="item.name" class="item-img" />
-
                     <div class="item-details">
                         <h3 class="item-name line-clamp-1">{{ item.name }}</h3>
                         <p class="item-price">{{ item.price }} €</p>
-                        <p class="item-quantity">Cantidad: {{ item.quantity }}</p>
                     </div>
-                    <button @click="cartStore.removeProduct(item.id)" class="delete-btn" title="Eliminar producto">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+                    <div class="quantity-controls">
+                        <button @click="cartStore.decrementProduct(item.id)" class="qty-btn">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span class="qty-number">{{ item.quantity }}</span>
+                        <button @click="cartStore.addProduct(item)" class="qty-btn">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="cart-summary">
@@ -67,7 +71,7 @@ const {
     height: 100%;
 }
 
-/* Estado vacío */
+/* carro vacío */
 .empty-cart {
     flex: 1;
     display: flex;
@@ -140,21 +144,43 @@ const {
     color: var(--primary-color);
 }
 
-.item-quantity {
-    font-size: 0.8rem;
-    color: var(--grey);
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-left: auto;
 }
 
-.delete-btn {
-    color: #dc3545;
-    font-size: 1rem;
-    padding: 0.5rem;
-    background: none;
+/* El botón circular */
+.qty-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     border: none;
+    background-color: #8fae9f;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-/* Caja de resumen de precios */
+.qty-btn:hover {
+    background-color: var(--primary-color, #42b983);
+}
+
+/* numero cantidad */
+.qty-number {
+    font-weight: bold;
+    font-size: 0.95rem;
+    color: var(--dark);
+    min-width: 16px;
+    text-align: center;
+}
+
+/* precios */
 .cart-summary {
     background: #f9f9f9;
     border-radius: 16px;

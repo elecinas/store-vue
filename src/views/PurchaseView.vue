@@ -38,20 +38,16 @@ onMounted(async () => {
         <div v-if="loading" class="loading-box">
             <p>Procesando confirmación...</p>
         </div>
-
         <div v-else class="success-card">
             <div class="icon-container">
                 <span class="success-icon">✓</span>
-            </div>
-            
+            </div>           
             <h1 class="title-section">¡Pedido Confirmado!</h1>
-            <p class="subtitle">Tu compra se ha registrado correctamente en nuestro sistema.</p>
-            
+            <p class="subtitle">Tu compra se ha registrado correctamente en nuestro sistema.</p>           
             <div class="order-info-box">
                 <span class="info-label">Identificador de tu compra</span>
                 <strong class="order-id">{{ purchaseId }}</strong>
             </div>
-
             <div v-if="orderDetails && orderDetails.items" class="order-summary-details">
                 <h3>Resumen de productos</h3>
                 <ul class="summary-list">
@@ -61,7 +57,6 @@ onMounted(async () => {
                     </li>
                 </ul>
             </div>
-
             <div class="action-footer">
                 <p class="notice">Guarda este código para cualquier reclamación o seguimiento de tu envío.</p>
                 <router-link to="/" class="return-home-btn">

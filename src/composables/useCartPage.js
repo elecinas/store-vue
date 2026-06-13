@@ -27,9 +27,9 @@ export default function useCartPage() {
         authStore.token,
       );
 
-      console.log("✅ carrito validado", serverData);
+      console.log("carrito validado", serverData);
 
-      // sincronizar datos con backend
+      // sincroniza con back
       cartStore.items.forEach((localItem) => {
         const fresh = serverData.find((sp) => sp.id === localItem.id);
 
@@ -57,7 +57,7 @@ export default function useCartPage() {
         authStore.token,
       );
 
-      console.log("✅ compra realizada", purchaseResult);
+      console.log("compra realizada", purchaseResult);
       cartStore.clearCart();
 
       const orderId = purchaseResult.purchaseId;

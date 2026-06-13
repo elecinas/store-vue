@@ -23,7 +23,6 @@ const formatDate = (dateString) => {
 <template>
   <div class="profile-view" v-if="authStore.user">
     <div class="profile-card">
-      
       <div class="profile-header">
         <div class="avatar-wrapper">
           <img 
@@ -36,15 +35,12 @@ const formatDate = (dateString) => {
         <h2 class="user-fullname">{{ authStore.user.name }} {{ authStore.user.surname }}</h2>
         <p class="user-username">@{{ authStore.user.username }}</p>
       </div>
-
       <hr class="divider" />
-
       <div class="profile-body">
         <div class="info-section">
           <h3>Sobre mí</h3>
           <p class="user-bio">{{ authStore.user.bio || 'Este usuario aún no ha escrito ninguna biografía.' }}</p>
         </div>
-
         <div class="info-meta">
           <div class="meta-item">
             <i class="fas fa-id-card meta-icon"></i>
@@ -53,7 +49,6 @@ const formatDate = (dateString) => {
               <span class="meta-value">#{{ authStore.user.id }}</span>
             </div>
           </div>
-
           <div class="meta-item" v-if="authStore.user.registrationDate">
             <i class="fas fa-calendar-alt meta-icon"></i>
             <div>
@@ -63,16 +58,13 @@ const formatDate = (dateString) => {
           </div>
         </div>
       </div>
-
       <div class="profile-actions">
         <button @click="handleLogout" class="btn btn-logout">
           <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
         </button>
       </div>
-
     </div>
   </div>
-  
   <div v-else class="profile-loading">
     <p>Cargando datos del perfil...</p>
   </div>
@@ -96,7 +88,6 @@ const formatDate = (dateString) => {
   gap: 1.5rem;
 }
 
-/* Cabecera del Perfil */
 .profile-header {
   display: flex;
   flex-direction: column;
@@ -150,7 +141,6 @@ const formatDate = (dateString) => {
   margin: 0;
 }
 
-/* Cuerpo del Perfil */
 .profile-body {
   display: flex;
   flex-direction: column;
@@ -175,7 +165,7 @@ const formatDate = (dateString) => {
   border: 1px solid #f1f2f6;
 }
 
-/* Metadatos */
+/* metadatos */
 .info-meta {
   display: flex;
   flex-direction: column;
@@ -215,7 +205,7 @@ const formatDate = (dateString) => {
   font-weight: 500;
 }
 
-/* Acciones */
+/* acciones */
 .profile-actions {
   margin-top: 1rem;
 }

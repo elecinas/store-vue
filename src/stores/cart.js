@@ -16,9 +16,20 @@ export const useCartStore = defineStore("cart", () => {
     }
   };
 
+  const decrementProduct = (product) => {
+    const existProduct = items.value.find((item) => item.id === product);
+    if (existProduct) {
+      if (existProduct.quantity > 1) {
+        existProduct.quantity--;
+      } else {
+        removeProduct(product);
+      }
+    }
+  };
+
   //elimina producto del todo
-  const removeProduct = (productId) => {
-    items.value = items.value.filter(item => item.id !== productId)
+  const removeProduct = (product) => {
+    items.value = items.value.filter(item => item.id !== product)
   }
 
   const totalItems = computed(() => {
@@ -36,6 +47,7 @@ export const useCartStore = defineStore("cart", () => {
   return {
     items,
     addProduct,
+    decrementProduct,
     removeProduct,
     totalItems,
     totalPrice,

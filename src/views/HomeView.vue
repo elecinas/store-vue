@@ -20,21 +20,16 @@ onMounted(() => {
 <template>
   <div class="home-view">
     <div v-if="error" class="error-message">{{ error }}</div>
-    
-    <div class="products-container">
-      
+    <div class="products-container">     
       <router-link 
         v-for="product in products" 
         :key="product.id" 
         :to="`/products/${product.id}`" 
         class="product-card"
       >
-        <img :src="product.image || product.imageUrl" :alt="product.title" class="product-image" />
-        
+        <img :src="product.image || product.imageUrl" :alt="product.title" class="product-image" /> 
         <h2 class="product-title">{{ product.title }}</h2>
-        
         <span class="product-price">{{ product.price }}€</span>
-        
         <div class="product-rating">
           <i 
             v-for="n in 5" 
@@ -46,11 +41,8 @@ onMounted(() => {
           </span>
         </div>
       </router-link>
-
     </div>
-
     <div v-if="loading" class="spinner">Cargando productos...</div>
-
     <button 
       v-if="products.length < total" 
       @click="loadMoreProducts" 
@@ -61,7 +53,6 @@ onMounted(() => {
     </button>
   </div>
 </template>
-
 <style scoped>
 
 h1, button {

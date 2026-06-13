@@ -7,7 +7,6 @@ const { username, password, errorMessage, handleSubmit } = useLogin();
 <template>
   <div class="login-view">
     <h1 class="title-section">Iniciar Sesión</h1>
-    
     <form @submit.prevent="handleSubmit" class="login-form">
       <div class="form-group">
         <label for="username">Usuario:</label>
@@ -19,7 +18,6 @@ const { username, password, errorMessage, handleSubmit } = useLogin();
           placeholder="Jane"
         />
       </div>
-      
       <div class="form-group">
         <label for="password">Contraseña:</label>
         <input 
@@ -30,9 +28,7 @@ const { username, password, errorMessage, handleSubmit } = useLogin();
           placeholder="Password"
         />
       </div>
-      
       <p v-if="errorMessage" class="error-msg">{{ errorMessage }}</p>
-      
       <button type="submit" class="btn btn--cta login-btn">
         Entrar
       </button>

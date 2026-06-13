@@ -17,7 +17,6 @@ export function useLogin() {
     const success = await authStore.login(username.value, password.value);
     
     if (success) {
-      // Redirección inteligente
       const redirectPath = route.query.redirect || '/';
       router.push(redirectPath);
     } else {

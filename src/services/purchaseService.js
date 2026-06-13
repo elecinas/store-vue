@@ -19,3 +19,19 @@ export const fetchOrderDetailsAPI = async (purchaseId, token) => {
 
     return response.json();
 };
+
+export const fetchUserPurchasesAPI = async (token) => {
+  const response = await fetch("http://localhost:3000/cart/purchases", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("No se pudo recuperar el historial de compras");
+  }
+
+  return response.json();
+};

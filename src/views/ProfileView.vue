@@ -1,23 +1,13 @@
 <script setup>
-import { useAuthStore } from '../stores/auth';
-import { useCartStore } from '../stores/cart';
-import { useRouter } from 'vue-router';
+import { useProfilePage } from '../composables/useProfilePage'; // Ajusta la ruta según tus carpetas
 
-const authStore = useAuthStore();
-const cartStore = useCartStore();
-const router = useRouter();
-
-const handleLogout = () => {
-    authStore.logout();
-    cartStore.clearCart();
-    router.push('/login');
-}
-
-const formatDate = (dateString) => {
-    if(!dateString) return '';
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('es-ES', options);
-}
+const { 
+  authStore, 
+  purchases, 
+  isLoadingOrders, 
+  handleLogout, 
+  formatDate 
+} = useProfilePage();
 </script>
 
 <template>
@@ -26,7 +16,7 @@ const formatDate = (dateString) => {
       <div class="profile-header">
         <div class="avatar-wrapper">
           <img 
-            :src="authStore.user.profileImg" 
+            :src="authStore.user.profileImg || 'https://placehold.co/110x110/e2e8f0/475569?text=User'" 
             :alt="authStore.user.name" 
             class="profile-avatar"
           />
@@ -58,6 +48,30 @@ const formatDate = (dateString) => {
           </div>
         </div>
       </div>
+      <hr class="divider" />
+      <div class="orders-section">
+        <h3>Tus Pedidos</h3>
+        <div v-if="isLoadingOrders" class="loading-orders">
+          <p>Cargando historial...</p>
+        </div>
+        <div v-else-if="purchases.length === 0" class="empty-orders">
+          <p>Aún no has realizado ninguna compra.</p>
+        </div>
+        <div v-else class="orders-list">
+          <router-link 
+            v-for="order in purchases" 
+            :key="order.purchaseId || order.id" 
+            :to="`/purchases/${order.purchaseId || order.id}`" 
+            class="order-card"
+          >
+            <div class="order-info">
+              <span class="order-id">Pedido #{{ order.purchaseId || order.id }}</span>
+              <span class="order-items">{{ order.items ? order.items.length : 0 }} artículo(s)</span>
+            </div>
+            <i class="fas fa-chevron-right chevron-icon"></i>
+          </router-link>
+        </div>
+      </div>
       <div class="profile-actions">
         <button @click="handleLogout" class="btn btn-logout">
           <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
@@ -65,6 +79,7 @@ const formatDate = (dateString) => {
       </div>
     </div>
   </div>
+  
   <div v-else class="profile-loading">
     <p>Cargando datos del perfil...</p>
   </div>
@@ -237,5 +252,79 @@ const formatDate = (dateString) => {
   text-align: center;
   margin-top: 4rem;
   color: var(--grey);
+}
+
+/* estilos pedidos */
+.orders-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.orders-section h3 {
+  font-size: 1.1rem;
+  color: var(--dark, #2c3e50);
+  margin: 0;
+  font-weight: 700;
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.order-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border: 1px solid #eef0f2;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.01);
+}
+
+.order-card:hover {
+  border-color: var(--primary-color, #42b983);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.order-id {
+  font-weight: 600;
+  color: var(--dark, #2c3e50);
+  font-size: 0.95rem;
+}
+
+.order-items {
+  font-size: 0.85rem;
+  color: var(--grey, #7f8c8d);
+}
+
+.chevron-icon {
+  color: #cbd5e1;
+  transition: color 0.2s ease;
+}
+
+.order-card:hover .chevron-icon {
+  color: var(--primary-color, #42b983);
+}
+
+.loading-orders, .empty-orders {
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  color: var(--grey, #7f8c8d);
+  font-size: 0.9rem;
 }
 </style>

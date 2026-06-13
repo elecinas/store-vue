@@ -1,209 +1,181 @@
 <script setup>
-import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { usePurchase } from '../composables/usePurchase';
 
-const route = useRoute();
-const authStore = useAuthStore();
-
-//id de la url (/purchases/:id)
-const purchaseId = route.params.id;
-
-const orderDetails = ref(null);
-const loading = ref(null);
-
-onMounted(async () => {
-    try {
-        const response = await fetch(`http://localhost:3000/purchases/${purchaseId}`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${authStore.token}`,
-                "Content-Type": "application/json"
-            }
-        })
-        if (response.ok) {
-            const data = await response.json();
-            orderDetails.value = data;
-        }
-    } catch (error) {
-        console.error(error)
-    } finally {
-        loading.value = false;
-    }
-})
+const { 
+    purchaseId, 
+    orderDetails, 
+    loading, 
+    error,
+    formatDate,
+    orderTotal
+} = usePurchase();
 </script>
 
 <template>
-    <div class="purchase-success-view">
-        <div v-if="loading" class="loading-box">
-            <p>Procesando confirmación...</p>
+    <div class="purchase-view">
+        <h1 class="page-title">Purchase Details</h1>   
+        <div v-if="loading" class="loading-state">
+            <p>Loading order details...</p>
         </div>
-        <div v-else class="success-card">
-            <div class="icon-container">
-                <span class="success-icon">✓</span>
-            </div>           
-            <h1 class="title-section">¡Pedido Confirmado!</h1>
-            <p class="subtitle">Tu compra se ha registrado correctamente en nuestro sistema.</p>           
-            <div class="order-info-box">
-                <span class="info-label">Identificador de tu compra</span>
-                <strong class="order-id">{{ purchaseId }}</strong>
+        <div v-else-if="error" class="error-state">
+            <p>{{ error }}</p>
+        </div>
+        <div v-else-if="orderDetails" class="order-content">
+            <div class="info-card">
+                <p class="info-row">
+                    <span class="label">Order ID:</span> 
+                    <span class="value">{{ purchaseId }}</span>
+                </p>
+                <p class="info-row">
+                    <span class="label">Date:</span> 
+                    <span class="value">{{ formatDate(orderDetails.purchaseDate) }}</span>
+                </p>
             </div>
-            <div v-if="orderDetails && orderDetails.items" class="order-summary-details">
-                <h3>Resumen de productos</h3>
-                <ul class="summary-list">
-                    <li v-for="item in orderDetails.items" :key="item.productId" class="summary-item">
-                        <span>Producto ID: {{ item.productId }}</span>
-                        <strong>x{{ item.quantity }}</strong>
-                    </li>
-                </ul>
+            <h2 class="section-subtitle">Products</h2>
+            <div class="products-list">
+                <div v-for="item in orderDetails.items" :key="item.productId" class="product-card">
+                    <img :src="item.imageUrl" :alt="item.name" class="product-img" /> 
+                    <div class="product-info">
+                        <h3 class="product-name">{{ item.name }}</h3>
+                        <p class="product-price">${{ item.price?.toFixed(2) }}</p>
+                    </div>
+                    <div class="product-quantity">
+                        <span>Quantity: {{ item.quantity }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="action-footer">
-                <p class="notice">Guarda este código para cualquier reclamación o seguimiento de tu envío.</p>
-                <router-link to="/" class="return-home-btn">
-                    Volver a la Tienda
-                </router-link>
+            <div class="total-card">
+                <p>
+                    <span class="total-label">Total:</span> 
+                    <span class="total-value">${{ orderDetails.totalAmount.toFixed(2) }}</span>
+                </p>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-.purchase-success-view {
-    max-width: 550px;
-    margin: 4rem auto;
-    padding: 0 1.5rem;
-    font-family: system-ui, -apple-system, sans-serif;
+.purchase-view {
+    padding: 1rem;
+    font-family: var(--font-family, system-ui, sans-serif);
+    color: #333;
+    padding-bottom: 5rem;
 }
 
-.loading-box {
-    text-align: center;
-    color: #7f8c8d;
-    font-size: 1.1rem;
-}
-
-.success-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    padding: 3rem 2rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
-    text-align: center;
-}
-
-.icon-container {
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
     margin-bottom: 1.5rem;
+    color: #000;
 }
 
-.success-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 70px;
-    height: 70px;
-    background-color: #ecfdf5;
-    color: #10b981;
-    font-size: 2.5rem;
-    font-weight: bold;
-    border-radius: 50%;
+.info-card, .product-card, .total-card {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f0f0;
 }
 
-.title-section {
-    font-size: 1.75rem;
-    color: #1e293b;
-    margin: 0 0 0.5rem 0;
+.info-row {
+    margin: 0.4rem 0;
+    font-size: 0.9rem;
+}
+
+.label {
     font-weight: 700;
+    color: #555;
+    margin-right: 0.3rem;
 }
 
-.subtitle {
-    color: #64748b;
-    font-size: 0.95rem;
-    margin: 0 0 2.5rem 0;
-    line-height: 1.5;
+.value {
+    color: #444;
 }
 
-.order-info-box {
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    padding: 1.25rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
+.section-subtitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #444;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.products-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.8rem;
 }
 
-.info-label {
-    font-size: 0.75rem;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 600;
-}
-
-.order-id {
-    font-size: 1.3rem;
-    color: #0f172a;
-    font-family: monospace;
-    word-break: break-all;
-}
-
-.action-footer {
-    margin-top: 2rem;
-}
-
-.notice {
-    font-size: 0.85rem;
-    color: #94a3b8;
-    margin-bottom: 1.5rem;
-}
-
-.return-home-btn {
-    display: inline-flex;
+.product-card {
+    display: flex;
     align-items: center;
+    gap: 1rem;
+    margin-bottom: 0; /*  margin-bottom?? usamos gap */
+}
+
+.product-img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    background-color: #0f172a;
-    color: #ffffff;
-    text-decoration: none;
-    width: 100%;
-    height: 48px;
-    border-radius: 10px;
+}
+
+.product-name {
+    font-size: 0.85rem;
     font-weight: 600;
-    font-size: 0.95rem;
-    transition: background-color 0.2s;
+    color: #333;
+    margin: 0 0 0.3rem 0;
 }
 
-.return-home-btn:hover {
-    background-color: #1e293b;
-}
-
-.order-summary-details {
-    text-align: left;
-    background: #ffffff;
-    border: 1px solid #edf2f7;
-    border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 2rem;
-}
-
-.order-summary-details h3 {
-    font-size: 0.95rem;
-    margin-bottom: 0.75rem;
-    color: #1e293b;
-    border-bottom: 1px solid #f1f5f9;
-    padding-bottom: 0.5rem;
-}
-
-.summary-list {
-    list-style: none;
-    padding: 0;
+.product-price {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #000;
     margin: 0;
 }
 
-.summary-item {
+.product-quantity {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.total-card {
+    margin-top: 1.5rem;
+    text-align: right;
+    padding: 1.2rem 1rem;
+}
+
+.total-card p {
+    margin: 0;
     display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    padding: 0.4rem 0;
-    color: #4a5568;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.total-label {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #444;
+}
+
+.total-value {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+.loading-state, .error-state {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
 }
 </style>
